@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     flutterWebViewPlugin.close();
 
-    flutterWebViewPlugin.tbinit("mm_130442443_43814415_384036311");
+    FlutterWebviewPlugin.tbinit("mm_130442443_43814415_384036311");
 
     _urlCtrl.addListener(() {
       selectedUrl = _urlCtrl.text;
