@@ -1,0 +1,69 @@
+group 'com.flutter_webview_plugin'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "http://repo.baichuan-android.taobao.com/content/groups/BaichuanRepositories/"
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // NOTE(jeffmikels): When targetSdkVersion or minSdkVersion is not set or < 4, gradle adds 
+        // additional scary permissions such as WRITE_EXTERNAL_STORAGE and READ_PHONE_STATE.
+        minSdkVersion 16
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+//    implementation 'com.github.johnpersano:supertoasts:2.0'
+    //fastjson
+    implementation 'com.alibaba:fastjson:1.2.9'
+
+    //支付
+    implementation files('libs/alipaySdk-20180601.jar')
+
+    //登陆
+    implementation 'com.ali.auth.sdk:alibabauth_core:1.1.4@jar'
+    implementation 'com.ali.auth.sdk:alibabauth_ui:1.1.4@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ext:1.1.4@jar'
+
+    //安全基础
+    implementation 'com.taobao.android:securityguardaar3:5.1.81@aar'
+
+    //Mtop网关
+    implementation 'com.taobao.android:mtopsdk_allinone_open:1.2.2.4@jar'
+
+    //applink
+    implementation 'com.taobao.android:alibc_applink:2.0.0.9@jar'
+
+    //UT
+    implementation 'com.taobao.android:utdid4all:1.1.5.3_proguard@jar'
+    implementation 'com.alibaba.mtl:app-monitor-sdk:2.5.1.3_for_bc_proguard@jar'
+
+    //电商SDK
+    implementation 'com.alibaba.sdk.android:alibc_trade_sdk:3.1.1.11@aar'
+}

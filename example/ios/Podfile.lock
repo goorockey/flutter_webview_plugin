@@ -1,0 +1,81 @@
+PODS:
+  - AlibabaAuthSDK (1.1.0.32):
+    - BCUserTrack
+    - mtop
+    - SecurityGuardSDK
+    - SGMain
+    - SGSecurityBody
+  - AlibcLinkPartnerSDK (1.1.1.2):
+    - UTDID
+  - AlibcTradeSDK (3.1.1.206):
+    - AlibabaAuthSDK
+    - AlibcLinkPartnerSDK
+    - AlipaySDK (= 2.0.0-bc)
+    - BCUserTrack
+    - mtop
+    - SecurityGuardSDK
+    - SGMain
+    - TUnionTradeSDK
+  - AlipaySDK (2.0.0-bc)
+  - BCUserTrack (5.1.0.9):
+    - UTDID
+  - Flutter (1.0.0)
+  - flutter_webview_plugin (0.0.1):
+    - AlibcTradeSDK
+    - Flutter
+  - mtop (2.0.3):
+    - SecurityGuardSDK
+    - SGMain
+    - SGSecurityBody
+  - SecurityGuardSDK (5.1.94)
+  - SGMain (5.1.94):
+    - SecurityGuardSDK (= 5.1.94)
+  - SGSecurityBody (5.1.29):
+    - SecurityGuardSDK (>= 5.1.94)
+    - SGMain (>= 5.1.94)
+  - TUnionTradeSDK (1.3.3)
+  - UTDID (1.1.0.16)
+
+DEPENDENCIES:
+  - AlibcTradeSDK
+  - Flutter (from `/Users/hetian9288/flutter/bin/cache/artifacts/engine/ios`)
+  - flutter_webview_plugin (from `/Users/hetian9288/develop/flutterpor/flutter_webview_plugin/ios`)
+
+SPEC REPOS:
+  http://repo.baichuan-ios.taobao.com/baichuanSDK/AliBCSpecs.git:
+    - AlibabaAuthSDK
+    - AlibcLinkPartnerSDK
+    - AlibcTradeSDK
+    - AlipaySDK
+    - BCUserTrack
+    - mtop
+    - SecurityGuardSDK
+    - SGMain
+    - SGSecurityBody
+    - TUnionTradeSDK
+    - UTDID
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: "/Users/hetian9288/flutter/bin/cache/artifacts/engine/ios"
+  flutter_webview_plugin:
+    :path: "/Users/hetian9288/develop/flutterpor/flutter_webview_plugin/ios"
+
+SPEC CHECKSUMS:
+  AlibabaAuthSDK: b5d7c1964f195c1182d9410e3158c469d25876fa
+  AlibcLinkPartnerSDK: 3308e1bccf0776a28bb697f0da6e1befe029ee12
+  AlibcTradeSDK: 7a17d15eb13182a6e96aeab0c73b6d4d2bc5b00a
+  AlipaySDK: a40a4099b24328d90d7ba4fb67f6ce753d7fa2c7
+  BCUserTrack: 684f468b8143be7a2ed10a8c449fd959b2a3a099
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  flutter_webview_plugin: ac4803f94deb7b6bec0f78086722a2aea3903793
+  mtop: 1513ec32f69174bd7c95a07d393f26ef1cad3af7
+  SecurityGuardSDK: 05f6d782189160f2b23b731eed5cb314ce584855
+  SGMain: 8a3008d8a709259d4868f78ae3265659e58e4416
+  SGSecurityBody: 098c981416d0f04faa605642e2da3bb556419f73
+  TUnionTradeSDK: 4d49ba32bb2a87dd3fcc644a80b0cd0d706a1e0b
+  UTDID: c28855683c5ea2e77e597cb14609328f7d470d6e
+
+PODFILE CHECKSUM: 7d8e3f0254dc112ec1422bbfeb47ca0b5aed345b
+
+COCOAPODS: 1.5.2
