@@ -110,6 +110,10 @@ class WebviewManager {
             }
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webView.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+
         ((ObservableWebView) webView).setOnScrollChangedCallback(new ObservableWebView.OnScrollChangedCallback(){
             public void onScroll(int x, int y, int oldx, int oldy){
                 Map<String, Object> yDirection = new HashMap<>();
@@ -259,6 +263,7 @@ class WebviewManager {
             webView.setVerticalScrollBarEnabled(false);
         }
 
+
         if (istblink) {
             this.showInWebView(new AlibcPage(url));
             return ;
@@ -296,13 +301,17 @@ class WebviewManager {
     @TargetApi(Build.VERSION_CODES.KITKAT)
     void eval(MethodCall call, final MethodChannel.Result result) {
         String code = call.argument("code");
-
         webView.evaluateJavascript(code, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
                 result.success(value);
             }
         });
+    }
+    void setJavaScriptEnabled(MethodCall call, MethodChannel.Result result) {
+        Boolean enabled = (Boolean) call.argument("enabled");
+        webView.getSettings().setJavaScriptEnabled(enabled);
+        result.success("");
     }
     /**
     * Reloads the Webview.

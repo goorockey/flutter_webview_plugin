@@ -23,6 +23,7 @@
     NSString *userAgent = call.arguments[@"userAgent"];
     NSNumber *withZoom = call.arguments[@"withZoom"];
     NSNumber *scrollBar = call.arguments[@"scrollBar"];
+    BOOL javaScriptEnabled = call.arguments[@"withJavascript"];
     
     if (clearCache != (id)[NSNull null] && [clearCache boolValue]) {
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
@@ -43,8 +44,11 @@
     } else {
         rc = viewController.view.bounds;
     }
-    
-    self.webview = [[WKWebView alloc] initWithFrame:rc];
+    WKPreferences *preferences = [[WKPreferences alloc] init];
+    preferences.javaScriptEnabled = javaScriptEnabled;
+    WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+    configuration.preferences = preferences;
+    self.webview = [[WKWebView alloc] initWithFrame:rc configuration:configuration];
     self.webview.navigationDelegate = self;
     self.webview.scrollView.delegate = self;
     self.webview.hidden = [hidden boolValue];
@@ -148,6 +152,13 @@
 - (void)reload {
     if (self.webview != nil) {
         [self.webview reload];
+    }
+}
+
+- (void) setJavaScriptEnabled:(FlutterMethodCall*)call {
+    if (self.webview != nil) {
+        BOOL _enabled = call.arguments[@"enabled"];
+        self.webview.configuration.preferences.javaScriptEnabled = _enabled;
     }
 }
 

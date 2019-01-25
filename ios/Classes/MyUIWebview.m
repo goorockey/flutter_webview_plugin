@@ -10,11 +10,13 @@
 @interface MyUIWebview() <UIWebViewDelegate, UIScrollViewDelegate> {
     BOOL _enableAppScheme;
     BOOL _enableZoom;
+    BOOL _iscoupon;
 }
 @end
 @implementation MyUIWebview
 - (void) initWebview:(FlutterMethodCall*)call viewController:(UIViewController*) viewController
 {
+    _iscoupon = false;
     NSNumber *clearCache = call.arguments[@"clearCache"];
     NSNumber *clearCookies = call.arguments[@"clearCookies"];
     NSNumber *hidden = call.arguments[@"hidden"];
@@ -155,6 +157,9 @@
     }
 }
 
+// UIWebView 不支持设置禁用JS渲染
+- (void) setJavaScriptEnabled:(FlutterMethodCall*)call {}
+
 - (void)cleanCookies {
     [[NSURLSession sharedSession] resetWithCompletionHandler:^{
     }];
@@ -206,6 +211,29 @@
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSString* url = request.URL.absoluteString;
+    
+    // 如果是是从优惠券页面打开则拦截商品页跳转
+    if (_iscoupon == true) {
+        if (
+            [url rangeOfString:@"taobao.com"].location != NSNotFound &&
+            [url rangeOfString:@"detail.htm"].location != NSNotFound
+            ){
+            _iscoupon = false;
+            [channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
+            return NO;
+        }else if (
+              [url rangeOfString:@"tmall.com"].location != NSNotFound &&
+              [url rangeOfString:@"item.htm"].location != NSNotFound
+            ){
+            [channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
+            return NO;
+        }
+    }
+    
+    // 标记是访问的优惠券页面
+    if ([url rangeOfString:@"uland.taobao.com/coupon/edetail"].location != NSNotFound) {
+        _iscoupon = true;
+    }
     
     // 调起支付宝支付 需要更新最新支付宝SDK
     BOOL isIntercepted = [[AlipaySDK defaultService] payInterceptorWithUrl:[request.URL absoluteString] fromScheme:@"cnganen" callback:^(NSDictionary *result) {

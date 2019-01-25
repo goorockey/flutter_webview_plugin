@@ -20,6 +20,7 @@ import com.alibaba.baichuan.android.trade.adapter.login.AlibcLogin;
 import com.alibaba.baichuan.android.trade.callback.AlibcLoginCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.baichuan.android.trade.model.OpenType;
+import com.alibaba.baichuan.android.trade.page.AlibcAddCartPage;
 import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
 import com.alibaba.baichuan.android.trade.page.AlibcPage;
 import com.alibaba.fastjson.JSONObject;
@@ -72,6 +73,9 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
             case "opentb":
                 opentb(call, result);
                 break;
+            case "addCart":
+                addCart(call, result);
+                break;
             case "launch":
                 openUrl(call, result);
                 break;
@@ -107,6 +111,9 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
                 break;
             case "cleanCookies":
                 cleanCookies(call, result);
+                break;
+            case "setJavaScriptEnabled":
+                setJavaScriptEnabled(call, result);
                 break;
             default:
                 result.notImplemented();
@@ -195,6 +202,20 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
             AliBaichuanConfig.getInstance().getAlibcTaokeParams(),
             AliBaichuanConfig.getInstance().getExParams(),
             WebviewManager.alibcTradeCallback
+        );
+        result.success("success");
+    }
+
+    private void addCart(MethodCall call, final MethodChannel.Result result) {
+        String itemId = call.argument("itemId");
+        AlibcBasePage page = new AlibcAddCartPage(itemId);
+        AlibcTrade.show(
+                activity,
+                page,
+                new AlibcShowParams(OpenType.Native, false),
+                AliBaichuanConfig.getInstance().getAlibcTaokeParams(),
+                AliBaichuanConfig.getInstance().getExParams(),
+                WebviewManager.alibcTradeCallback
         );
         result.success("success");
     }
@@ -337,6 +358,13 @@ public class FlutterWebviewPlugin implements MethodCallHandler, PluginRegistry.A
     private void show(MethodCall call, final MethodChannel.Result result) {
         if (webViewManager != null) {
             webViewManager.show(call, result);
+        }
+    }
+
+    private void setJavaScriptEnabled(MethodCall call, final MethodChannel.Result result) {
+        if (webViewManager != null) {
+            Log.i("webview", "setJavaScriptEnabled: " );
+            webViewManager.setJavaScriptEnabled(call, result);
         }
     }
 

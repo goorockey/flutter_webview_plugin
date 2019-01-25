@@ -31,6 +31,8 @@ android {
         // NOTE(jeffmikels): When targetSdkVersion or minSdkVersion is not set or < 4, gradle adds 
         // additional scary permissions such as WRITE_EXTERNAL_STORAGE and READ_PHONE_STATE.
         minSdkVersion 16
+        multiDexEnabled true
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
     lintOptions {
         disable 'InvalidPackage'
@@ -61,7 +63,7 @@ dependencies {
     implementation 'com.taobao.android:alibc_applink:2.0.0.9@jar'
 
     //UT
-    implementation 'com.taobao.android:utdid4all:1.1.5.3_proguard@jar'
+    // implementation 'com.taobao.android:utdid4all:1.1.5.3_proguard@jar'
     implementation 'com.alibaba.mtl:app-monitor-sdk:2.5.1.3_for_bc_proguard@jar'
 
     //电商SDK

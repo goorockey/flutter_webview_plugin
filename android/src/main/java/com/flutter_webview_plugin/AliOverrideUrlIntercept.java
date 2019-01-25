@@ -29,6 +29,7 @@ import java.util.Map;
 public class AliOverrideUrlIntercept {
     Activity activity;
     TBAppLinkSDK appLink;
+    Boolean isCoupon = false;
     AliOverrideUrlIntercept(Activity context){
         activity = context;
     }
@@ -84,7 +85,27 @@ public class AliOverrideUrlIntercept {
             return true;
         }
 
-        final PayTask task = new PayTask(activity);
+        // 领券后跳转拦截
+        // STEP 2 阻止跳转
+        if (isCoupon) {
+            if (url.indexOf("taobao.com") > -1 && url.indexOf("detail.htm") > -1) {
+                isCoupon = false;
+                FlutterWebviewPlugin.channel.invokeMethod("onTaobaoCouponSuccess", "");
+                return true;
+            }else if (url.indexOf("tmall.com") > -1 && url.indexOf("item.htm") > -1) {
+                isCoupon = false;
+                FlutterWebviewPlugin.channel.invokeMethod("onTaobaoCouponSuccess", "");
+                return true;
+            }
+        }
+        // STEP 1 标记领券
+        if (url.indexOf("uland.taobao.com/coupon/edetail") > -1) {
+            isCoupon = true;
+        }
+
+
+
+       final PayTask task = new PayTask(activity);
         boolean isIntercepted = task.payInterceptorWithUrl(url, true, new H5PayCallback() {
             @Override
             public void onPayResult(final H5PayResultModel result) {

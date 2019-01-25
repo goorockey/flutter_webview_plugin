@@ -3,7 +3,11 @@ package com.flutter_webview_plugin;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.net.http.SslError;
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -25,12 +29,12 @@ public class BrowserClient extends WebViewClient {
         this.activity = activity;
     }
 
+    @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        Log.i("BrowserClient", "shouldOverrideUrlLoading: " + url);
+
         if (!(url.startsWith("http") || url.startsWith("https"))) {
             return true;
         }
-
         // 阿里系拦截
         boolean isIntercept = aliOverrideUrlIntercept.isIntercept(url);
 
@@ -44,8 +48,12 @@ public class BrowserClient extends WebViewClient {
 
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        Log.i("onPageStarted", "onPageStarted: " + url);
         super.onPageStarted(view, url, favicon);
+        Log.i("页面状态", "onPageStarted: " + url);
+        // STEP 1 标记领券
+        if (url.indexOf("uland.taobao.com/coupon/edetail") > -1) {
+            aliOverrideUrlIntercept.isCoupon = true;
+        }
         Map<String, Object> data = new HashMap<>();
         data.put("url", url);
         data.put("type", "startLoad");
@@ -55,8 +63,11 @@ public class BrowserClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
+        CookieManager cookieManager = CookieManager.getInstance();
+        String cookieStr = cookieManager.getCookie(url);
         Map<String, Object> data = new HashMap<>();
         data.put("url", url);
+        data.put("cookie", cookieStr);
 
         FlutterWebviewPlugin.channel.invokeMethod("onUrlChanged", data);
 
@@ -82,6 +93,15 @@ public class BrowserClient extends WebViewClient {
         Map<String, Object> data = new HashMap<>();
         data.put("url", request.getUrl().toString());
         data.put("code", Integer.toString(errorResponse.getStatusCode()));
+        FlutterWebviewPlugin.channel.invokeMethod("onHttpError", data);
+    }
+
+    @Override
+    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+        super.onReceivedSslError(view, handler, error);
+        Map<String, Object> data = new HashMap<>();
+        data.put("url", view.getUrl());
+        data.put("code", error.toString());
         FlutterWebviewPlugin.channel.invokeMethod("onHttpError", data);
     }
 }

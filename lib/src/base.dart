@@ -11,6 +11,29 @@ enum WebViewState { shouldStart, startLoad, finishLoad }
 
 // TODO: use an id by webview to be able to manage multiple webview
 
+
+class TaobaoOrderChange {
+  String type;
+  String code;
+  String msg;
+
+  TaobaoOrderChange({this.type, this.code, this.msg});
+
+  TaobaoOrderChange.fromJson(Map<String, dynamic> json) {
+    type = json['type'];
+    code = json['code'];
+    msg = json['msg'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['type'] = this.type;
+    data['code'] = this.code;
+    data['msg'] = this.msg;
+    return data;
+  }
+}
+
 /// Singleton class that communicate with a Webview Instance
 class FlutterWebviewPlugin {
   factory FlutterWebviewPlugin() => _instance ??= FlutterWebviewPlugin._();
@@ -28,7 +51,8 @@ class FlutterWebviewPlugin {
   final _onStateChanged = StreamController<WebViewStateChanged>.broadcast();
   final _onScrollXChanged = StreamController<double>.broadcast();
   final _onScrollYChanged = StreamController<double>.broadcast();
-  final _onTaobaoOrderChange = StreamController<double>.broadcast();
+  final _onTaobaoOrderChange = StreamController<TaobaoOrderChange>.broadcast();
+  final _onTaobaoCouponSuccess = StreamController<Null>.broadcast();
   final _onHttpError = StreamController<WebViewHttpError>.broadcast();
 
   Future<Null> _handleMessages(MethodCall call) async {
@@ -46,7 +70,10 @@ class FlutterWebviewPlugin {
         _onScrollYChanged.add(call.arguments['yDirection']);
         break;
       case 'onTaobaoOrderChange':
-        _onTaobaoOrderChange.add(call.arguments);
+        _onTaobaoOrderChange.add(TaobaoOrderChange.fromJson(Map<String, dynamic>.from(call.arguments)));
+        break;
+      case 'onTaobaoCouponSuccess':
+        _onTaobaoCouponSuccess.add(null);
         break;
       case 'onState':
         _onStateChanged.add(
@@ -80,6 +107,10 @@ class FlutterWebviewPlugin {
 
   Stream<WebViewHttpError> get onHttpError => _onHttpError.stream;
 
+  Stream<TaobaoOrderChange> get onTaobaoOrderChange => _onTaobaoOrderChange.stream;
+
+  Stream<Null> get onTaobaoCouponSuccess => _onTaobaoCouponSuccess.stream;
+
   // 初始化淘宝SDK
   static Future<bool> tbinit(String pid) async {
     try {
@@ -92,7 +123,7 @@ class FlutterWebviewPlugin {
   }
 
   // 登陆淘宝
-  Future<TaobaoUser> tblogin() async {
+  static Future<TaobaoUser> tblogin() async {
     try {
       final ret = await FlutterWebviewPlugin.channel.invokeMethod("tblogin", {});
       return TaobaoUser.fromJson(Map.from(ret));
@@ -102,7 +133,7 @@ class FlutterWebviewPlugin {
   }
 
   // 淘宝是否登陆
-  Future<bool> tbislogin() async {
+  static Future<bool> tbislogin() async {
     try{
       await FlutterWebviewPlugin.channel.invokeMethod("tbislogin", {});
       return Future.value(true);
@@ -113,7 +144,7 @@ class FlutterWebviewPlugin {
   }
 
   // 获取淘宝登陆的用户
-  Future<TaobaoUser> tbgetuser() async {
+  static Future<TaobaoUser> tbgetuser() async {
     try{
       final ret = await FlutterWebviewPlugin.channel.invokeMethod("tbgetuser", {});
       return TaobaoUser.fromJson(Map.from(ret));
@@ -124,7 +155,7 @@ class FlutterWebviewPlugin {
   }
 
   // 退出淘宝登陆
-  Future<bool> tblogout() async {
+  static Future<bool> tblogout() async {
     try{
       await FlutterWebviewPlugin.channel.invokeMethod("tblogout", {});
       return Future.value(true);
@@ -135,12 +166,23 @@ class FlutterWebviewPlugin {
   }
 
   // 唤醒淘宝打开页面
-  Future<bool> opentb(String url) async {
+  static Future<bool> opentb(String url) async {
     try{
       await FlutterWebviewPlugin.channel.invokeMethod("opentb", {"url": url});
       return Future.value(true);
     }catch (e){
       print(["opentb", e]);
+      return Future.value(false);
+    }
+  }
+
+  // 加购物车
+  static Future<bool> addCart(String itemId) async {
+    try{
+      await FlutterWebviewPlugin.channel.invokeMethod("addCart", {"itemId": itemId});
+      return Future.value(true);
+    }catch (e){
+      print(["addCart", e]);
       return Future.value(false);
     }
   }
@@ -245,6 +287,10 @@ class FlutterWebviewPlugin {
     await FlutterWebviewPlugin.channel.invokeMethod('reloadUrl', args);
   }
 
+  Future<dynamic> setJavaScriptEnabled(bool r) {
+    return FlutterWebviewPlugin.channel.invokeMethod('setJavaScriptEnabled', {"enabled": r});
+  }
+
   // Clean cookies on WebView
   Future<Null> cleanCookies() async => await FlutterWebviewPlugin.channel.invokeMethod('cleanCookies');
 
@@ -259,17 +305,22 @@ class FlutterWebviewPlugin {
     _onScrollXChanged.close();
     _onScrollYChanged.close();
     _onHttpError.close();
+    _onTaobaoOrderChange.close();
+    _onTaobaoCouponSuccess.close();
     _instance = null;
   }
 
   Future<Map<String, String>> getCookies() async {
-    final cookiesString = await evalJavascript('document.cookie');
+    String cookiesString = await evalJavascript('document.cookie');
     final cookies = <String, String>{};
 
     if (cookiesString?.isNotEmpty == true) {
+      cookiesString = cookiesString.substring(1, cookiesString.length - 1);
+      cookiesString = cookiesString.replaceAll('\\"', '');
+      cookiesString = cookiesString.replaceAll('"', '');
       cookiesString.split(';').forEach((String cookie) {
         final split = cookie.split('=');
-        cookies[split[0]] = split[1];
+        cookies[split[0].trim()] = split[1].trim();
       });
     }
 
@@ -290,7 +341,7 @@ class FlutterWebviewPlugin {
 }
 
 class WebViewStateChanged {
-  WebViewStateChanged(this.type, this.url, this.navigationType);
+  WebViewStateChanged(this.type, this.url, this.navigationType, this.cookie);
 
   factory WebViewStateChanged.fromMap(Map<String, dynamic> map) {
     WebViewState t;
@@ -305,12 +356,30 @@ class WebViewStateChanged {
         t = WebViewState.finishLoad;
         break;
     }
-    return WebViewStateChanged(t, map['url'], map['navigationType']);
+    return WebViewStateChanged(t, map['url'], map['navigationType'], map["cookie"]);
   }
 
   final WebViewState type;
   final String url;
   final int navigationType;
+  final String cookie;
+  Map<String, String> _cookie;
+
+  Map<String, String> getCookie() {
+    if (cookie == null || cookie == "") {
+      return {};
+    }
+    if (_cookie == null) {
+      _cookie  = <String, String>{};
+      if (cookie?.isNotEmpty == true) {
+        cookie.split(';').forEach((String item) {
+          final split = item.split('=');
+          _cookie[split[0].trim()] = split[1].trim();
+        });
+      }
+    }
+    return _cookie;
+  }
 }
 
 class WebViewHttpError {

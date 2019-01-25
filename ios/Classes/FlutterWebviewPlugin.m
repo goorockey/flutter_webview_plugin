@@ -87,7 +87,10 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     } else if ([@"reload" isEqualToString:call.method]) {
         [self reload];
         result(nil);
-    } else {
+    } else if ([@"setJavaScriptEnabled" isEqualToString:call.method]){
+        [self setJavaScriptEnabled:call];
+        result(nil);
+    }else {
         result(FlutterMethodNotImplemented);
     }
 }
@@ -168,6 +171,11 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 
 - (void)cleanCookies {
     [self.myWebview cleanCookies];
+}
+
+- (void) setJavaScriptEnabled:(FlutterMethodCall*)call
+{
+    [self.myWebview setJavaScriptEnabled:call];
 }
 
 @end
