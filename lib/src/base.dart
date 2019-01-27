@@ -135,8 +135,7 @@ class FlutterWebviewPlugin {
   // 淘宝是否登陆
   static Future<bool> tbislogin() async {
     try{
-      await FlutterWebviewPlugin.channel.invokeMethod("tbislogin", {});
-      return Future.value(true);
+      return await FlutterWebviewPlugin.channel.invokeMethod("tbislogin", {});
     }catch (e){
       print(['tbislogin', e]);
       return Future.value(false);
