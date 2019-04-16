@@ -121,6 +121,7 @@
 {
     if (self.webview != nil) {
         NSString *url = call.arguments[@"url"];
+        
         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
         [self.webview loadRequest:request];
     }
@@ -212,6 +213,11 @@
 {
     NSString* url = request.URL.absoluteString;
     
+    if ([url rangeOfString:@"https://h5.m.taobao.com/ww/index.htm"].location != NSNotFound) {
+        [AliBaichuanConfig.sharedInstance show:url];
+        return NO;
+    }
+    
     // 如果是是从优惠券页面打开则拦截商品页跳转
     if (_iscoupon == true) {
         if (
@@ -294,6 +300,10 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    // 标记是访问的优惠券页面
+    if ([webView.request.URL.absoluteString rangeOfString:@"uland.taobao.com/coupon/edetail"].location != NSNotFound) {
+        _iscoupon = true;
+    }
     [channel invokeMethod:@"onState" arguments:@{@"type": @"startLoad", @"url": webView.request.URL.absoluteString}];
 }
 
