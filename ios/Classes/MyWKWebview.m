@@ -112,7 +112,7 @@
         self.webview = nil;
         
         // manually trigger onDestroy
-        [channel invokeMethod:@"onDestroy" arguments:nil];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onDestroy" arguments:nil];
     }
 }
 
@@ -177,10 +177,10 @@
 
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView {
     id xDirection = @{@"xDirection": @(scrollView.contentOffset.x) };
-    [channel invokeMethod:@"onScrollXChanged" arguments:xDirection];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onScrollXChanged" arguments:xDirection];
     
     id yDirection = @{@"yDirection": @(scrollView.contentOffset.y) };
-    [channel invokeMethod:@"onScrollYChanged" arguments:yDirection];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onScrollYChanged" arguments:yDirection];
 }
 
 #pragma mark -- WkWebView Delegate
@@ -190,13 +190,13 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     id data = @{@"url": navigationAction.request.URL.absoluteString,
                 @"type": @"shouldStart",
                 @"navigationType": [NSNumber numberWithInt:navigationAction.navigationType]};
-    [channel invokeMethod:@"onState" arguments:data];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onState" arguments:data];
     
     if (navigationAction.navigationType == WKNavigationTypeBackForward) {
-        [channel invokeMethod:@"onBackPressed" arguments:nil];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onBackPressed" arguments:nil];
     } else {
         id data = @{@"url": navigationAction.request.URL.absoluteString};
-        [channel invokeMethod:@"onUrlChanged" arguments:data];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onUrlChanged" arguments:data];
     }
     
     if (_enableAppScheme ||
@@ -211,22 +211,22 @@ decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
 
 
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation {
-    [channel invokeMethod:@"onState" arguments:@{@"type": @"startLoad", @"url": webView.URL.absoluteString}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onState" arguments:@{@"type": @"startLoad", @"url": webView.URL.absoluteString}];
 }
 
 - (void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [channel invokeMethod:@"onState" arguments:@{@"type": @"finishLoad", @"url": webView.URL.absoluteString}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onState" arguments:@{@"type": @"finishLoad", @"url": webView.URL.absoluteString}];
 }
 
 - (void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
-    [channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
     if ([navigationResponse.response isKindOfClass:[NSHTTPURLResponse class]]) {
         NSHTTPURLResponse * response = (NSHTTPURLResponse *)navigationResponse.response;
         
-        [channel invokeMethod:@"onHttpError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", response.statusCode], @"url": webView.URL.absoluteString}];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onHttpError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", response.statusCode], @"url": webView.URL.absoluteString}];
     }
     decisionHandler(WKNavigationResponsePolicyAllow);
 }

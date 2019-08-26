@@ -237,11 +237,12 @@ class _MyHomePageState extends State<MyHomePage> {
             RaisedButton(
               onPressed: () {
                 flutterWebViewPlugin.launch(
-                  "https://h5.m.taobao.com/mlapp/mytaobao.html",
-                  rect: Rect.fromLTWH(0.0, 0.0, MediaQuery.of(context).size.width, 300.0),
+                  "https://m.taobao.com",
+                  rect: Rect.fromLTWH(0.0, 0.0, MediaQuery.of(context).size.width, 300.0,),
+                  istb: true,
                 );
               },
-              child: const Text('打开淘宝界面'),
+              child: const Text('打开淘宝界面a'),
             ),
             Container(
               padding: const EdgeInsets.all(24.0),

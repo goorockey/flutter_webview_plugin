@@ -8,19 +8,14 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.alibaba.baichuan.android.trade.AlibcTrade;
-import com.alibaba.baichuan.android.trade.callback.AlibcTradeCallback;
 import com.alibaba.baichuan.android.trade.model.AlibcShowParams;
 import com.alibaba.baichuan.android.trade.model.OpenType;
-import com.alibaba.baichuan.android.trade.model.TradeResult;
 import com.alibaba.baichuan.android.trade.page.AlibcBasePage;
 import com.alibaba.baichuan.android.trade.page.AlibcPage;
 import com.alipay.sdk.app.H5PayCallback;
 import com.alipay.sdk.app.PayTask;
 import com.alipay.sdk.util.H5PayResultModel;
-import com.taobao.applink.TBAppLinkParam;
 import com.taobao.applink.TBAppLinkSDK;
-import com.taobao.applink.exception.TBAppLinkException;
-import com.taobao.applink.param.TBURIParam;
 
 import java.net.URLDecoder;
 import java.util.HashMap;

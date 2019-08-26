@@ -10,6 +10,7 @@
 #import <Flutter/Flutter.h>
 #import "MyWebview.h"
 #import "AliBaichuanConfig.h"
+#import "FlutterWebviewPlugin.h"
 
 @interface MyWKWebview : NSObject <MyWebview>
 @property (nonatomic, retain) WKWebView *webview;

@@ -10,6 +10,7 @@
 #import "MyWebview.h"
 #import <Foundation/Foundation.h>
 #import "AliBaichuanConfig.h"
+#import "FlutterWebviewPlugin.h"
 #import <AlipaySDK/AlipaySDK.h>
 
 NS_ASSUME_NONNULL_BEGIN

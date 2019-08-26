@@ -12,23 +12,31 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 @end
 
 @implementation FlutterWebviewPlugin
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     channel = [FlutterMethodChannel
                methodChannelWithName:CHANNEL_NAME
                binaryMessenger:[registrar messenger]];
     
-    UIViewController *viewController = [UIApplication sharedApplication].delegate.window.rootViewController;
-    FlutterWebviewPlugin* instance = [[FlutterWebviewPlugin alloc] initWithViewController:viewController];
+    FlutterWebviewPlugin* instance = [[FlutterWebviewPlugin sharedInstance] initWithChannel:channel];
+    [registrar addApplicationDelegate:instance];
     
     [registrar addMethodCallDelegate:instance channel:channel];
 }
 
++ (instancetype) sharedInstance
+{
+    static FlutterWebviewPlugin *instance = nil;
+    if (!instance) {
+        instance = [[FlutterWebviewPlugin alloc] init];
+    }
+    return instance;
+}
 
-
-- (instancetype)initWithViewController:(UIViewController *)viewController {
+- (instancetype)initWithChannel:(FlutterMethodChannel *)channel {
     self = [super init];
     if (self) {
-        self.viewController = viewController;
+        self.channel = channel;
     }
     return self;
 }
@@ -102,8 +110,8 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
     }else {
         self.myWebview = [[MyWKWebview alloc] init];
     }
-
-    [self.myWebview initWebview:call viewController:_viewController];
+    
+    [self.myWebview initWebview:call viewController:[UIApplication sharedApplication].delegate.window.rootViewController];
 }
 
 - (void)navigate:(FlutterMethodCall*)call {
@@ -176,6 +184,49 @@ static NSString *const CHANNEL_NAME = @"flutter_webview_plugin";
 - (void) setJavaScriptEnabled:(FlutterMethodCall*)call
 {
     [self.myWebview setJavaScriptEnabled:call];
+}
+
+// AppDelegate
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url options:(NSDictionary<NSString *,id> *)options {
+    // 新接口写法
+    if (@available(iOS 9.0, *)) {
+        if (![[AlibcTradeSDK sharedInstance] application:application
+                                                 openURL:url
+                                                 options:options]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation{
+    NSLog(@"%@", url.absoluteURL);
+    //如果极简开发包不可用，会跳转支付宝钱包进行支付，需要将支付宝钱包的支付结果回传给开发包
+    if ([url.host isEqualToString:@"safepay"]) {
+        [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
+            //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
+            NSLog(@"result = %@",resultDic);
+        }];
+        return YES;
+    }
+    if ([url.host isEqualToString:@"platformapi"]){//支付宝钱包快登授权返回authCode
+
+        [[AlipaySDK defaultService] processAuthResult:url standbyCallback:^(NSDictionary *resultDic) {
+            //【由于在跳转支付宝客户端支付的过程中，商户app在后台很可能被系统kill了，所以pay接口的callback就会失效，请商户对standbyCallback返回的回调结果进行处理,就是在这个方法里面处理跟callback一样的逻辑】
+            NSLog(@"result = %@",resultDic);
+        }];
+        return YES;
+    }
+
+    // 新接口写法
+    if (![[AlibcTradeSDK sharedInstance] application:application
+                                             openURL:url
+                                   sourceApplication:sourceApplication
+                                          annotation:annotation]) {
+        return YES;
+    }
+    return NO;
 }
 
 @end

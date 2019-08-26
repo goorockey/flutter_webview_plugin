@@ -11,7 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static FlutterMethodChannel *channel;
 @interface AliBaichuanConfig : NSObject
 @property (nonatomic, retain) AlibcTradeTaokeParams *taokeParams;
 @property (nonatomic, retain) AlibcTradeShowParams *showParams;

@@ -56,7 +56,8 @@
     
     [viewController.view addSubview:self.webview];
     NSString *url = call.arguments[@"url"];
-    [AliBaichuanConfig.sharedInstance showInWebView:_webview url:url];
+    
+    [AliBaichuanConfig.sharedInstance showInWebView:self.webview url:url];
 //    [self navigate:call];
 }
 - (void) navigate:(FlutterMethodCall*)call
@@ -64,6 +65,7 @@
     if (self.webview != nil) {
         NSString *url = call.arguments[@"url"];
         NSNumber *withLocalUrl = call.arguments[@"withLocalUrl"];
+        
         if ( [withLocalUrl boolValue]) {
             NSFileHandle *readHandle = [NSFileHandle fileHandleForReadingAtPath:url];
             
@@ -80,7 +82,7 @@
             }
 //
             [self.webview loadRequest:request];
-            
+
         }
     }
 }
@@ -114,7 +116,7 @@
     
         
         // manually trigger onDestroy
-        [channel invokeMethod:@"onDestroy" arguments:nil];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onDestroy" arguments:nil];
     }
 }
 - (void) reloadUrl:(FlutterMethodCall*)call
@@ -175,10 +177,10 @@
 
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView {
     id xDirection = @{@"xDirection": @(scrollView.contentOffset.x) };
-    [channel invokeMethod:@"onScrollXChanged" arguments:xDirection];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onScrollXChanged" arguments:xDirection];
     
     id yDirection = @{@"yDirection": @(scrollView.contentOffset.y) };
-    [channel invokeMethod:@"onScrollYChanged" arguments:yDirection];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onScrollYChanged" arguments:yDirection];
 }
 
 //-(void)getJsContext{
@@ -225,13 +227,14 @@
             [url rangeOfString:@"detail.htm"].location != NSNotFound
             ){
             _iscoupon = false;
-            [channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
+            [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
             return NO;
         }else if (
               [url rangeOfString:@"tmall.com"].location != NSNotFound &&
               [url rangeOfString:@"item.htm"].location != NSNotFound
             ){
-            [channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
+            _iscoupon = false;
+            [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoCouponSuccess" arguments:@""];
             return NO;
         }
     }
@@ -283,7 +286,7 @@
                          };
                 break;
         }
-        [channel invokeMethod:@"onTaobaoOrderChange" arguments:iRes];
+        [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:iRes];
     }];
     
     if (isIntercepted) {
@@ -304,17 +307,17 @@
     if ([webView.request.URL.absoluteString rangeOfString:@"uland.taobao.com/coupon/edetail"].location != NSNotFound) {
         _iscoupon = true;
     }
-    [channel invokeMethod:@"onState" arguments:@{@"type": @"startLoad", @"url": webView.request.URL.absoluteString}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onState" arguments:@{@"type": @"startLoad", @"url": webView.request.URL.absoluteString}];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"WebKitCacheModelPreferenceKey"];
-    [channel invokeMethod:@"onState" arguments:@{@"type": @"finishLoad", @"url": webView.request.URL.absoluteString}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onState" arguments:@{@"type": @"finishLoad", @"url": webView.request.URL.absoluteString}];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
-    [channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
+    [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
 }
 @end

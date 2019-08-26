@@ -23,6 +23,6 @@
 - (void) forward;
 - (void) reload;
 - (void) cleanCookies;
-- (void) setJavaScriptEnabled:(FlutterMethodCall*)call;
+- (void) setJavaScriptEnabled:(FlutterMethodCall*_Nullable)call;
 
 @end

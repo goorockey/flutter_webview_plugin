@@ -46,12 +46,12 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.2.9'
 
     //支付
-    implementation files('libs/alipaySdk-20180601.jar')
+    implementation files('/Users/hetian9288/develop/flutterpor/ganengou/android/app/libs/alipaySdk-15.6.5.aar')
 
     //登陆
-    implementation 'com.ali.auth.sdk:alibabauth_core:1.1.4@jar'
-    implementation 'com.ali.auth.sdk:alibabauth_ui:1.1.4@aar'
-    implementation 'com.ali.auth.sdk:alibabauth_ext:1.1.4@jar'
+    implementation 'com.ali.auth.sdk:alibabauth_core:1.6.1.4@jar'
+    implementation 'com.ali.auth.sdk:alibabauth_ui:1.6.1.4@aar'
+    implementation 'com.ali.auth.sdk:alibabauth_ext:1.6.1.4@jar'
 
     //安全基础
     implementation 'com.taobao.android:securityguardaar3:5.1.81@aar'

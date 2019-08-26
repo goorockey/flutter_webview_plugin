@@ -6,6 +6,7 @@
 //
 
 #import "AliBaichuanConfig.h"
+#import "FlutterWebviewPlugin.h"
 
 @implementation AliBaichuanConfig{
     NSString *pid;
@@ -22,11 +23,12 @@
 - (void)initBcSDK: (FlutterMethodCall*)call result:(FlutterResult)result
 {
     pid = call.arguments[@"pid"];
+    
     // 百川平台基础SDK初始化，加载并初始化各个业务能力插件
     [[AlibcTradeSDK sharedInstance] asyncInitWithSuccess:^{
-        result(@"success");
+        NSLog(@"淘客初始化OK");
     } failure:^(NSError *error) {
-        result([FlutterError errorWithCode:[NSString stringWithFormat:@"%ld", (long)error.code] message:error.description details:@""]);
+        NSLog(@"淘客初始化失败， %@", error.description);
     }];
     
     // 开发阶段打开日志开关，方便排查错误信息
@@ -117,13 +119,13 @@
      tradeProcessSuccessCallback:^(AlibcTradeResult * _Nullable result) {
          if (result.result == AlibcTradeResultTypeAddCard) {
              NSDictionary *ret = @{@"type": @"card"};
-             [channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
+             [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
          } else if (result.result == AlibcTradeResultTypePaySuccess) {
              NSDictionary *ret = @{@"type": @"pay", @"orders": result.payResult.paySuccessOrders};
-             [channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
+             [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
          }
      } tradeProcessFailedCallback:^(NSError * _Nullable error) {
-         [channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
+         [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
      }];
 }
 
@@ -140,16 +142,16 @@
      trackParam:nil
      tradeProcessSuccessCallback:^(AlibcTradeResult * _Nullable result) {
          if (result.result == AlibcTradeResultTypeAddCard) {
-             [channel invokeMethod:@"onTaobaoOrderChange" arguments:@{@"type": @"card",}];
+             [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:@{@"type": @"card",}];
          } else if (result.result == AlibcTradeResultTypePaySuccess) {
              NSDictionary *ret = @{
                                    @"type": @"pay",
                                    @"orders": result.payResult.paySuccessOrders
                                    };
-             [channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
+             [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:ret];
          }
      } tradeProcessFailedCallback:^(NSError * _Nullable error) {
-         [channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
+         [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onError" arguments:@{@"code": [NSString stringWithFormat:@"%ld", error.code], @"error": error.localizedDescription}];
      }];
 }
 
