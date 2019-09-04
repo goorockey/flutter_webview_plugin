@@ -2,7 +2,7 @@
 //  AliBaichuanConfig.m
 //  flutter_webview_plugin
 //
-//  Created by debug on 2019/09/04.
+//  Created by debug on 2019/09/04. hongtang.online
 //
 
 #import "AliBaichuanConfig.h"
@@ -22,38 +22,26 @@
 
 - (void)initBcSDK: (FlutterMethodCall*)call result:(FlutterResult)result
 {
-    pid = call.arguments[@"pid"];
-    
     // 百川平台基础SDK初始化，加载并初始化各个业务能力插件
+    [[AlibcTradeSDK sharedInstance] setDebugLogOpen:YES];//开发阶段打开日志开关，方便排查错误信息
+    
+    [[AlibcTradeSDK sharedInstance] setIsvVersion:@"2.2.2"];
+    [[AlibcTradeSDK sharedInstance] setIsvAppName:@"baichuanDemo"];
     [[AlibcTradeSDK sharedInstance] asyncInitWithSuccess:^{
-        NSLog(@"淘客初始化OK");
+        //      openSDKSwitchLog(NO);
+        TLOG_INFO(@"百川SDK初始化成功");
     } failure:^(NSError *error) {
-        NSLog(@"淘客初始化失败， %@", error.description);
+        TLOG_INFO(@"百川SDK初始化失败");
+        result([FlutterError errorWithCode:[NSString stringWithFormat:@"%ld", (long)error.code] message:error.description details:@""]);
     }];
     
-    // 开发阶段打开日志开关，方便排查错误信息
-    //默认调试模式打开日志,release关闭,可以不调用下面的函数
-    [[AlibcTradeSDK sharedInstance] setDebugLogOpen:NO];
+
     
-    // 配置全局的淘客参数
-    //如果没有阿里妈妈的淘客账号,setTaokeParams函数需要调用
-    AlibcTradeTaokeParams *taokeParams = [[AlibcTradeTaokeParams alloc] init];
-    taokeParams.pid = pid; //mm_XXXXX为你自己申请的阿里妈妈淘客pid
-    [[AlibcTradeSDK sharedInstance] setTaokeParams:taokeParams];
-    
-    //设置全局的app标识，在电商模块里等同于isv_code
-    //没有申请过isv_code的接入方,默认不需要调用该函数
-    [[AlibcTradeSDK sharedInstance] setISVCode:@"your_isv_code"];
-    
-    // 设置全局配置，是否强制使用h5
-//    [[AlibcTradeSDK sharedInstance] setIsForceH5:YES];
-    
-    _showParams = [[AlibcTradeShowParams alloc] init];
-    _showParams.openType = AlibcOpenTypeAuto;
 }
 
 - (void)login: (FlutterMethodCall*)call result:(FlutterResult)result
 {
+    [[ALBBSDK sharedInstance]setAuthOption: NormalAuth];
     [[ALBBSDK sharedInstance] auth:[UIApplication sharedApplication].delegate.window.rootViewController
            successCallback:^(ALBBSession *session) {
                ALBBUser *s = [session getUser];
@@ -65,6 +53,7 @@
                                      @"access_token": s.topAccessToken,
                                      @"auth_code": s.topAuthCode
                                      };
+
                result(ret);
            }
            failureCallback:^(ALBBSession *session, NSError *error) {
