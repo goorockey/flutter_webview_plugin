@@ -16,6 +16,15 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'AlibcTradeSDK'
+  s.dependency 'AliAuthSDK'
+  s.dependency 'mtopSDK'
+  s.dependency 'securityGuard'
+  s.dependency 'AliLinkPartnerSDK'
+  s.dependency 'BCUserTrack'
+  s.dependency 'UTDID'
+  s.dependency 'AlipaySDK'
+
+
   s.static_framework = true
   
   s.ios.deployment_target = '8.0'
