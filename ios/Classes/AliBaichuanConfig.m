@@ -2,7 +2,7 @@
 //  AliBaichuanConfig.m
 //  flutter_webview_plugin
 //
-//  Created by 王贺天 on 2018/12/18.
+//  Created by debug on 2019/09/04.
 //
 
 #import "AliBaichuanConfig.h"
@@ -109,10 +109,14 @@
     id<AlibcTradeService> service = [AlibcTradeSDK sharedInstance].tradeService;
     AlibcTradeShowParams *showParamsNatice = [[AlibcTradeShowParams alloc] init];
     showParamsNatice.openType = AlibcOpenTypeNative;
-    id<AlibcTradePage> page = [AlibcTradePageFactory page:url];
+//    id<AlibcTradePage> page = [AlibcTradePageFactory page:url];
+
+
     [service
-     show:[UIApplication sharedApplication].delegate.window.rootViewController
-     page:page
+     openByUrl:url
+     identity:@"trade"
+     webView:nil
+     parentController: [UIApplication sharedApplication].delegate.window.rootViewController
      showParams:showParamsNatice
      taoKeParams:_taokeParams
      trackParam:nil
@@ -132,11 +136,12 @@
 - (void) showInWebView:(UIWebView *)webView url:(NSString *)url
 {
     id<AlibcTradeService> service = [AlibcTradeSDK sharedInstance].tradeService;
-    id<AlibcTradePage> page = [AlibcTradePageFactory page:url];
+//    id<AlibcTradePage> page = [AlibcTradePageFactory page:url];
     [service
-     show:[UIApplication sharedApplication].delegate.window.rootViewController
-     webView:webView
-     page:page
+     openByUrl:url
+     identity:@"trade"
+     webView:nil
+     parentController: [UIApplication sharedApplication].delegate.window.rootViewController
      showParams: [AliBaichuanConfig.sharedInstance showParams]
      taoKeParams:[AliBaichuanConfig.sharedInstance taokeParams]
      trackParam:nil
