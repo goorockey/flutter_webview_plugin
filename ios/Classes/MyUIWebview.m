@@ -244,7 +244,7 @@
         _iscoupon = true;
     }
     
-    /*
+    
     // 调起支付宝支付 需要更新最新支付宝SDK
     BOOL isIntercepted = [[AlipaySDK defaultService] payInterceptorWithUrl:[request.URL absoluteString] fromScheme:@"cnganen" callback:^(NSDictionary *result) {
         
@@ -289,8 +289,8 @@
         }
         [[FlutterWebviewPlugin sharedInstance].channel invokeMethod:@"onTaobaoOrderChange" arguments:iRes];
     }];
-    */
-    BOOL isIntercepted = false;
+   
+   // BOOL isIntercepted = false;
     if (isIntercepted) {
         return NO;
     }
