@@ -129,7 +129,7 @@
     [service
      openByUrl:url
      identity:@"trade"
-     webView:nil
+     webView:webView
      parentController: [UIApplication sharedApplication].delegate.window.rootViewController
      showParams: [AliBaichuanConfig.sharedInstance showParams]
      taoKeParams:[AliBaichuanConfig.sharedInstance taokeParams]
